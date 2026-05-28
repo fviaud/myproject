@@ -1,0 +1,21 @@
+info:
+  name: Add one todo
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/{{version}}/todos"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "test45",
+        "completed": false
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

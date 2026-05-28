@@ -1,0 +1,22 @@
+FROM golang:1.26-alpine AS base
+
+ARG http_proxy
+ARG https_proxy
+ENV http_proxy=${http_proxy}
+ENV https_proxy=${https_proxy}
+
+WORKDIR /opt/app
+ENV GOPATH=/opt/app/go \
+PATH=$PATH:$GOPATH/bin
+
+RUN apk add --no-cache build-base
+RUN go install github.com/air-verse/air@v1.61.7
+
+COPY backend/go.mod backend/go.sum ./
+RUN go mod download
+
+COPY backend/ ./
+
+EXPOSE 8080
+
+CMD ["/opt/app/go/bin/air"]

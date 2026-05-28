@@ -1,0 +1,25 @@
+info:
+  name: Put one todo
+  type: http
+  seq: 6
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/{{version}}/todos/:id"
+  params:
+    - name: id
+      value: fc3d9a3f-fc39-4b80-9474-f84f89c26501
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "title": "test4545uuuu",
+        "completed": true
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

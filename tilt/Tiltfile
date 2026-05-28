@@ -1,0 +1,48 @@
+build_args = {}
+if os.getenv('http_proxy'):
+  build_args['http_proxy'] = os.environ['http_proxy']
+  build_args['https_proxy'] = os.environ['http_proxy']
+
+docker_build(
+    'localhost:5000/frontend',
+    context='..',
+    dockerfile='../frontend/dockerfile-tilt',
+    build_args=build_args,
+    network="host",
+    only=[
+        'frontend',
+        'packages',
+        'pnpm-lock.yaml',
+        'pnpm-workspace.yaml',
+        'package.json',
+    ],
+    live_update=[
+        sync('../frontend', '/opt/app'),
+        # run('cd /opt/app && pnpm install', trigger=['../frontend/package.json']),
+    ],
+)
+docker_build(
+    'localhost:5000/backend',
+    context='..',
+    dockerfile='../backend/dockerfile-tilt',
+    build_args=build_args,
+    network="host",
+    only=[
+        'backend',
+        'packages',
+        'pnpm-lock.yaml',
+        'pnpm-workspace.yaml',
+        'package.json',
+    ],
+    live_update=[
+        sync('../backend', '/opt/app'),
+    ],
+)
+
+# Créer le secret Kubernetes à partir du fichier .env
+local('kubectl create secret generic postgres-secret --from-env-file=.env -n atelier --dry-run=client -o yaml | kubectl apply -f -')
+
+# Déployer le manifest Kubernetes
+k8s_yaml('frontend.yml')
+k8s_yaml('backend.yml')
+k8s_yaml('postgres.yml')
