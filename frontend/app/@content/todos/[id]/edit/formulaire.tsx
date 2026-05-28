@@ -9,6 +9,7 @@ import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 import * as z from "zod"
 const pathRoot = "/todos"
 
@@ -79,7 +80,7 @@ export default function Page({ item }: { item: z.infer<typeof TodoSchema> }) {
         return
       } else {
         setError(null)
-        // Toaster.success(id ? "Todo updated successfully!" : "Todo created successfully!")
+        toast.success("Updated successfully!")
         router.push(pathRoot)
       }
     } catch (error) {

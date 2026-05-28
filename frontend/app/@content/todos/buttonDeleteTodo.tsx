@@ -1,6 +1,6 @@
 "use client"
-import { redirect } from "next/navigation"
 import { deleteTodo } from "@/lib/actionsTodo"
+import { redirect } from "next/navigation"
 
 const todosRoute = "/todos"
 
