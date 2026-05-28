@@ -23,7 +23,22 @@ const widgets = {
   ),
 }
 
-export default function Page({ data }: { data: z.infer<typeof TodoSchema> }) {
+function pick<T, K extends readonly (keyof T)[]>(
+  obj: T,
+  keys: K
+): Pick<T, K[number]> {
+  return Object.fromEntries(keys.map((key) => [key, obj[key]])) as Pick<
+    T,
+    K[number]
+  >
+}
+
+export default function Page({ item }: { item: z.infer<typeof TodoSchema> }) {
+  const itemData = item.id
+    ? pick(item, Object.keys(TodoUpdateSchema.shape) as (keyof typeof item)[])
+    : {}
+
+  const [data, setData] = useState(itemData || {})
   const [state, setState] = useState<"idle" | "submitting">("idle")
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -45,6 +60,8 @@ export default function Page({ data }: { data: z.infer<typeof TodoSchema> }) {
 
   async function handleSubmit({ formData }: IChangeEvent) {
     setState("submitting")
+
+    console.log("Form data:", formData)
     const result = TodoUpdateSchema.safeParse(formData)
     if (!result.success) {
       setError("Validation error: " + result.error.message)
@@ -52,7 +69,10 @@ export default function Page({ data }: { data: z.infer<typeof TodoSchema> }) {
       return
     }
     try {
-      const { error } = await updateTodo({ ...formData, id: data.id })
+      const { error } = await updateTodo({
+        ...formData,
+        ...(item.id ? { id: item.id } : {}),
+      })
 
       if (error) {
         setError(error)
@@ -77,8 +97,10 @@ export default function Page({ data }: { data: z.infer<typeof TodoSchema> }) {
         formData={data}
         uiSchema={uiSchema}
         validator={validator}
+        onChange={(e) => setData(e.formData)}
         onSubmit={handleSubmit}
         widgets={widgets}
+        className="flex flex-col gap-2"
       >
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => router.push(pathRoot)}>

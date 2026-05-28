@@ -13,5 +13,5 @@ export default async function Page({
     return <div>Todo not found</div>
   }
 
-  return <Formulaire data={todo} />
+  return <Formulaire item={todo} />
 }
